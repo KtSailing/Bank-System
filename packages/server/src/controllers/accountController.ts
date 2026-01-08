@@ -84,3 +84,18 @@ export const getAccountTransactions = async (req: Request, res: Response) => {
     return res.status(500).json({ error: 'Internal Server Error' });
   }
 };
+
+// 追加: ユーザーIDから口座情報を取得する
+export const getUserAccount = async (req: Request, res: Response) => {
+  try {
+    const { userId } = req.params;
+    const account = await Account.findOne({ where: { userId } });
+    
+    if (!account) {
+      return res.status(404).json({ error: 'Account not found' });
+    }
+    return res.json(account);
+  } catch (error) {
+    return res.status(500).json({ error: 'Internal Server Error' });
+  }
+};

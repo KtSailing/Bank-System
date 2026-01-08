@@ -72,8 +72,18 @@ export const DashboardPage = () => {
 
       <div style={{ marginTop: '30px' }}>
         <h3>操作メニュー</h3>
-        <button style={{ marginRight: '10px' }} onClick={() => alert('送金画面へ (未実装)')}>送金する</button>
-        <button onClick={() => alert('履歴画面へ (未実装)')}>取引履歴を見る</button>
+        <button 
+    style={{ marginRight: '10px', padding: '10px 20px', cursor: 'pointer' }} 
+    onClick={() => navigate('/transfer')} // リンク先設定
+  >
+    送金する
+  </button>
+  <button 
+    style={{ padding: '10px 20px', cursor: 'pointer' }} 
+    onClick={() => navigate('/history')} // リンク先設定
+  >
+    取引履歴を見る
+  </button>
       </div>
     </div>
   );
