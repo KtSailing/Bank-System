@@ -1,21 +1,19 @@
-import { useEffect, useState } from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { LoginPage } from './LoginPage';
+import { RegisterPage } from './RegisterPage';
+import { DashboardPage } from './DashboardPage';
 
 function App() {
-  const [message, setMessage] = useState('');
-
-  useEffect(() => {
-    // Expressサーバー(ポート4000)へリクエスト
-    fetch('http://localhost:4000/')
-      .then(res => res.json())
-      .then(data => setMessage(data.message))
-      .catch(err => console.error(err));
-  }, []);
-
   return (
-    <div style={{ padding: '20px' }}>
-      <h1>Bank System Client</h1>
-      <p>Server Status: {message ? `✅ ${message}` : 'Loading...'}</p>
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+        <Route path="/dashboard" element={<DashboardPage />} />
+        {/* デフォルトはログイン画面へ */}
+        <Route path="*" element={<Navigate to="/login" replace />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
