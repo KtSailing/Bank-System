@@ -1,24 +1,18 @@
 // packages/server/src/routes/index.ts
 import { Router } from 'express';
-import { registerUser } from '../controllers/userController';
-import { createAccount, getAccount, getAccountTransactions } from '../controllers/accountController';
-import { transferMoney } from '../controllers/transferController'; // 追加
+import { register, login } from '../controllers/authController';
+import { getAccount, getAccountTransactions } from '../controllers/accountController';
+import { transferMoney } from '../controllers/transferController';
 
 const router = Router();
 
+// 認証系
+router.post('/auth/register', register); // URLを変更しました
+router.post('/auth/login', login);       // 追加
 
-
-router.post('/users', registerUser);
-router.post('/accounts', createAccount);
-
-// 送金 API を追加
-// POST http://localhost:4000/api/transfer
-router.post('/transfer', transferMoney);
-
-// 口座情報の取得 (GET /api/accounts/1)
+// 口座・取引系 (本来はここに認証ミドルウェアを挟みますが、まずは疎通優先)
 router.get('/accounts/:id', getAccount);
-
-// 取引履歴の取得 (GET /api/accounts/1/transactions)
 router.get('/accounts/:id/transactions', getAccountTransactions);
+router.post('/transfer', transferMoney);
 
 export default router;
