@@ -51,3 +51,39 @@ export const transferMoney = async (req: Request, res: Response) => {
     return res.status(400).json({ error: error.message });
   }
 };
+
+export const depositMoney = async (req: Request, res: Response) => {
+  const t = await sequelize.transaction();
+
+  try {
+    const { accountId, amount } = req.body;
+
+    if (!amount || amount <= 0) throw new Error('入金額は1以上である必要があります');
+
+    // 1. 口座を取得
+    const account = await Account.findByPk(accountId, { transaction: t });
+    if (!account) throw new Error('口座が見つかりません');
+
+    // 2. 残高を増やす
+    await account.update({ balance: account.balance + amount }, { transaction: t });
+
+    // 3. 取引履歴を作成 (fromAccountId は null)
+    const transactionRecord = await Transaction.create({
+      fromAccountId: null, // 外部からの入金
+      toAccountId: account.id,
+      amount,
+      type: 'DEPOSIT' // 入金タイプ
+    }, { transaction: t });
+
+    await t.commit();
+
+    return res.status(200).json({
+      message: 'Deposit successful',
+      newBalance: account.balance
+    });
+
+  } catch (error: any) {
+    await t.rollback();
+    return res.status(400).json({ error: error.message });
+  }
+};

@@ -1,3 +1,4 @@
+// packages/client/src/DashboardPage.tsx
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from './api';
@@ -8,38 +9,27 @@ export const DashboardPage = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const storedUser = localStorage.getItem('user');
-    const token = localStorage.getItem('token');
+    // 修正: async関数を中で定義して呼ぶ
+    const initDashboard = async () => {
+      const storedUser = localStorage.getItem('user');
+      if (!storedUser) {
+        navigate('/login');
+        return;
+      }
 
-    if (!storedUser || !token) {
-      navigate('/login'); // ログインしてなければ飛ばす
-      return;
-    }
-
-    const userData = JSON.parse(storedUser);
-    setUser(userData);
-
-    // 本当は「自分の口座を取得するAPI」を作るべきですが、
-    // ここでは簡易的に「口座ID = ユーザーID」と仮定して叩いてみます
-    // ※Step 1-1で登録時にAccountも作っているので、ユーザーIDに対応する口座があるはずです
-    // 正確には: GET /api/users/:userId/accounts などが必要
-    fetchAccountData(userData.id); 
-  }, [navigate]);
-
-  const fetchAccountData = async (userId: number) => {
-    try {
-      // 本来は口座IDが必要ですが、今回は便宜上ID=1の口座などを直接指定するのではなく
-      // サーバー側で「ユーザーIDから口座を引く」実装に変えるのが本来の姿です。
-      // 現状のAPI仕様に合わせ、クライアント側で口座を検索する処理は複雑になるため、
-      // ここでは仮実装として「ユーザーIDと同じIDの口座」を取得してみます。
-      // (※前回のUser A = Account 1, User B = Account 2 のような連番の偶然に頼る形です)
+      const userData = JSON.parse(storedUser);
+      setUser(userData);
       
-      const res = await api.get(`/accounts/${userId}`);
-      setAccount(res.data);
-    } catch (err) {
-      console.error('口座情報の取得に失敗', err);
-    }
-  };
+      try {
+        const res = await api.get(`/users/${userData.id}/account`);
+        setAccount(res.data);
+      } catch (err) {
+        console.error('口座取得エラー', err);
+      }
+    };
+
+    initDashboard(); // 定義した関数を実行
+  }, [navigate]);
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -47,43 +37,42 @@ export const DashboardPage = () => {
     navigate('/login');
   };
 
-  if (!user) return <div>Loading...</div>;
+  if (!user) return <div className="container">Loading...</div>;
 
   return (
-    <div style={{ padding: '20px' }}>
-      <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-        <h1>Bank Dashboard</h1>
-        <button onClick={handleLogout}>Logout</button>
+    <div className="container">
+      <header className="flex-between" style={{ marginBottom: '20px' }}>
+        <h1>Bank App</h1>
+        <button onClick={handleLogout} className="secondary" style={{ width: 'auto', padding: '8px 16px' }}>
+          Logout
+        </button>
       </header>
       
-      <div style={{ background: '#f4f4f4', padding: '20px', borderRadius: '8px' }}>
-        <h2>ようこそ、{user.name} さん</h2>
+      <div className="card">
+        <p style={{ color: 'var(--text-sub)' }}>Welcome, {user.name}</p>
+        
         {account ? (
           <div style={{ marginTop: '20px' }}>
-            <p style={{ fontSize: '1.2rem' }}>口座番号: <strong>{account.accountNumber}</strong></p>
-            <p style={{ fontSize: '2rem', color: '#28a745' }}>
-              残高: ¥{account.balance.toLocaleString()}
+            <p style={{ fontSize: '0.9rem', color: 'var(--text-sub)' }}>ACCOUNT NUMBER</p>
+            <p style={{ fontSize: '1.5rem', fontFamily: 'monospace', letterSpacing: '2px' }}>
+              {account.accountNumber}
+            </p>
+            
+            <p style={{ fontSize: '0.9rem', color: 'var(--text-sub)', marginTop: '20px' }}>CURRENT BALANCE</p>
+            <p style={{ fontSize: '2.5rem', fontWeight: 'bold', color: 'var(--success)', margin: '0' }}>
+              ¥{account.balance.toLocaleString()}
             </p>
           </div>
         ) : (
-          <p>口座情報を読み込み中、または口座が見つかりません...</p>
+          <p>Loading account info...</p>
         )}
       </div>
 
-      <div style={{ marginTop: '30px' }}>
-        <h3>操作メニュー</h3>
-        <button 
-    style={{ marginRight: '10px', padding: '10px 20px', cursor: 'pointer' }} 
-    onClick={() => navigate('/transfer')} // リンク先設定
-  >
-    送金する
-  </button>
-  <button 
-    style={{ padding: '10px 20px', cursor: 'pointer' }} 
-    onClick={() => navigate('/history')} // リンク先設定
-  >
-    取引履歴を見る
-  </button>
+      <div className="mt-20" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '15px' }}>
+        {/* ボタンを3つ並べるスタイルに変更しました */}
+        <button onClick={() => navigate('/deposit')} style={{ backgroundColor: 'var(--success)' }}>入金する</button>
+        <button onClick={() => navigate('/transfer')}>送金する</button>
+        <button onClick={() => navigate('/history')} className="secondary">取引履歴</button>
       </div>
     </div>
   );
