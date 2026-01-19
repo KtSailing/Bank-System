@@ -5,6 +5,7 @@ import { DashboardPage } from './DashboardPage';
 import { TransferPage } from './TransferPage'; // 追加
 import { HistoryPage } from './HistoryPage';   // 追加
 import { DepositPage } from './DepositPage';
+import { AdminPage } from './AdminPage'; // 追加
 
 function App() {
   return (
@@ -19,6 +20,8 @@ function App() {
         
         <Route path="*" element={<Navigate to="/login" replace />} />
         <Route path="/deposit" element={<DepositPage />} /> {/* 追加 */}
+
+        <Route path="/admin" element={<AdminPage />} />
       </Routes>
     </BrowserRouter>
   );

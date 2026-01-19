@@ -3,12 +3,16 @@ import { Model, DataTypes, Sequelize } from 'sequelize';
 
 export class Transaction extends Model {
   public id!: number;
-  public fromAccountId!: number | null; // 入金の場合はnullになることもあるため
-  public toAccountId!: number | null;   // 出金の場合はnullになることもあるため
+  public fromAccountId!: number | null;
+  public toAccountId!: number | null;
   public amount!: number;
-  public type!: 'DEPOSIT' | 'WITHDRAWAL' | 'TRANSFER'; // 取引種別
+  public type!: 'DEPOSIT' | 'WITHDRAWAL' | 'TRANSFER';
+  
+  // 追加フィールド
+  public description!: string; 
 
   public readonly createdAt!: Date;
+  public readonly updatedAt!: Date; // trueにするため型定義を追加
 }
 
 export const initTransaction = (sequelize: Sequelize) => {
@@ -35,11 +39,17 @@ export const initTransaction = (sequelize: Sequelize) => {
         type: DataTypes.STRING,
         allowNull: false,
       },
+      // 追加: 説明文
+      description: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        defaultValue: '', // デフォルトは空文字
+      },
     },
     {
       sequelize,
       tableName: 'transactions',
-      updatedAt: false, // 履歴は更新されないので不要
+      updatedAt: true, // trueに変更（または行削除）して更新日時を有効化
     }
   );
 };
