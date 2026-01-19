@@ -1,3 +1,4 @@
+// packages/client/src/HistoryPage.tsx
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from './api';
@@ -8,73 +9,71 @@ export const HistoryPage = () => {
   const [myAccountId, setMyAccountId] = useState<number | null>(null);
 
   useEffect(() => {
-    const fetchData = async () => {
-      const userJson = localStorage.getItem('user');
-      if (!userJson) return navigate('/login');
-      const user = JSON.parse(userJson);
-
+    // 修正: async関数を中で定義して呼ぶ
+    const fetchHistory = async () => {
+      const userStr = localStorage.getItem('user');
+      if (!userStr) {
+        navigate('/login');
+        return;
+      }
+      
+      const user = JSON.parse(userStr);
       try {
-        // 1. まず自分の口座IDを取得
+        // 1. 口座ID取得
         const accountRes = await api.get(`/users/${user.id}/account`);
-        const accountId = accountRes.data.id;
-        setMyAccountId(accountId);
-
-        // 2. そのIDを使って履歴を取得
-        const historyRes = await api.get(`/accounts/${accountId}/transactions`);
+        setMyAccountId(accountRes.data.id);
+        
+        // 2. 履歴取得
+        const historyRes = await api.get(`/accounts/${accountRes.data.id}/transactions`);
         setTransactions(historyRes.data);
       } catch (err) {
         console.error('履歴取得失敗', err);
       }
     };
-    fetchData();
+
+    fetchHistory();
   }, [navigate]);
 
   return (
-    <div style={{ maxWidth: '600px', margin: '30px auto', padding: '20px' }}>
-      <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-        <h2>取引履歴</h2>
-        <button onClick={() => navigate('/dashboard')}>戻る</button>
-      </header>
+    <div className="container">
+      <div className="card">
+        <header className="flex-between">
+          <h2>取引履歴</h2>
+          <button onClick={() => navigate('/dashboard')} className="secondary" style={{ width: 'auto' }}>戻る</button>
+        </header>
 
-      <table style={{ width: '100%', borderCollapse: 'collapse', border: '1px solid #ddd' }}>
-        <thead>
-          <tr style={{ background: '#f8f9fa' }}>
-            <th style={{ padding: '10px', border: '1px solid #ddd' }}>日時</th>
-            <th style={{ padding: '10px', border: '1px solid #ddd' }}>内容</th>
-            <th style={{ padding: '10px', border: '1px solid #ddd' }}>金額</th>
-          </tr>
-        </thead>
-        <tbody>
-          {transactions.map(tx => {
-            // 自分が送金元(From)なら「出金」、送金先(To)なら「入金」
-            const isOutgoing = tx.fromAccountId === myAccountId;
-            const date = new Date(tx.createdAt).toLocaleString();
-            
-            return (
-              <tr key={tx.id}>
-                <td style={{ padding: '10px', border: '1px solid #ddd', fontSize: '0.9rem' }}>{date}</td>
-                <td style={{ padding: '10px', border: '1px solid #ddd' }}>
-                  {tx.type === 'TRANSFER' ? (isOutgoing ? '振込送金' : '振込入金') : tx.type}
-                </td>
-                <td style={{ 
-                  padding: '10px', 
-                  border: '1px solid #ddd', 
-                  textAlign: 'right',
-                  color: isOutgoing ? 'red' : 'green',
-                  fontWeight: 'bold'
-                }}>
-                  {isOutgoing ? '-' : '+'}{tx.amount.toLocaleString()}
-                </td>
-              </tr>
-            );
-          })}
-          {transactions.length === 0 && (
+        <table>
+          <thead>
             <tr>
-              <td colSpan={3} style={{ padding: '20px', textAlign: 'center' }}>履歴はありません</td>
+              <th>日時</th>
+              <th>内容</th>
+              <th style={{ textAlign: 'right' }}>金額</th>
             </tr>
-          )}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {transactions.map(tx => {
+              const isOutgoing = tx.fromAccountId === myAccountId;
+              return (
+                <tr key={tx.id}>
+                  <td style={{ fontSize: '0.85rem', color: 'var(--text-sub)' }}>
+                    {new Date(tx.createdAt).toLocaleDateString()} <br/>
+                    {new Date(tx.createdAt).toLocaleTimeString()}
+                  </td>
+                  <td>
+                    {tx.type === 'TRANSFER' ? (isOutgoing ? '振込送金' : '振込入金') : tx.type}
+                  </td>
+                  <td style={{ textAlign: 'right', fontWeight: 'bold' }} className={isOutgoing ? 'text-danger' : 'text-success'}>
+                    {isOutgoing ? '-' : '+'}{tx.amount.toLocaleString()}
+                  </td>
+                </tr>
+              );
+            })}
+            {transactions.length === 0 && (
+              <tr><td colSpan={3} style={{ textAlign: 'center', padding: '20px' }}>履歴なし</td></tr>
+            )}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };

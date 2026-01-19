@@ -1,68 +1,116 @@
+/* packages/client/src/index.css */
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
+  /* Mac Dark Mode風のカラーパレット */
+  --bg-body: #1c1c1e;       /* 全体の背景 */
+  --bg-card: #2c2c2e;       /* カード・入力欄の背景 */
+  --text-main: #f2f2f7;     /* メイン文字色 (ほぼ白) */
+  --text-sub: #aeaeb2;      /* サブ文字色 (グレー) */
+  --border-color: #3a3a3c;  /* 枠線 */
+  --primary: #0a84ff;       /* ボタン色 (ブルー) */
+  --danger: #ff453a;        /* エラー・赤字 */
+  --success: #30d158;       /* 成功・緑字 */
 }
 
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  background-color: var(--bg-body);
+  color: var(--text-main);
+  -webkit-font-smoothing: antialiased;
 }
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+/* 共通レイアウト */
+.container {
+  max-width: 600px;
+  margin: 40px auto;
+  padding: 20px;
 }
 
-button {
+/* カードデザイン（フォームやダッシュボードの枠） */
+.card {
+  background-color: var(--bg-card);
+  padding: 30px;
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* 入力フォーム */
+label {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--text-sub);
+  font-size: 0.9rem;
+}
+
+input {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 20px;
+  background-color: #1c1c1e; /* カードより少し暗く */
+  border: 1px solid var(--border-color);
   border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+  color: var(--text-main);
+  font-size: 1rem;
+  box-sizing: border-box; /* paddingを含めた幅計算 */
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
+input:focus {
+  outline: none;
+  border-color: var(--primary);
 }
+
+/* ボタン */
+button {
+  width: 100%;
+  padding: 12px;
+  background-color: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+button:hover {
+  opacity: 0.8;
+}
+
+button.secondary {
+  background-color: transparent;
+  color: var(--primary);
+  border: 1px solid var(--border-color);
+}
+
+/* リンク */
+a {
+  color: var(--primary);
+  text-decoration: none;
+}
+
+/* テーブル（履歴画面用） */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+th {
+  text-align: left;
+  color: var(--text-sub);
+  border-bottom: 1px solid var(--border-color);
+  padding: 10px;
+}
+
+td {
+  padding: 15px 10px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+/* ユーティリティ */
+.text-danger { color: var(--danger); }
+.text-success { color: var(--success); }
+.mt-20 { margin-top: 20px; }
+.flex-between { display: flex; justify-content: space-between; align-items: center; }

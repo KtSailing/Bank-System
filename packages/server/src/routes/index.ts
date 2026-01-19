@@ -7,7 +7,7 @@ import {
   getAccountTransactions,
   getUserAccount // 追加インポート
 } from '../controllers/accountController';
-import { transferMoney } from '../controllers/transferController';
+import { transferMoney, depositMoney } from '../controllers/transferController';
 
 const router = Router();
 
@@ -19,6 +19,7 @@ router.post('/auth/login', login);       // 追加
 router.get('/accounts/:id', getAccount);
 router.get('/accounts/:id/transactions', getAccountTransactions);
 router.post('/transfer', transferMoney);
+router.post('/deposit', depositMoney);
 
 // 追加: ユーザーIDから口座を取得するルート
 router.get('/users/:userId/account', getUserAccount);

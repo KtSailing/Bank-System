@@ -1,16 +1,14 @@
-// packages/client/src/TransferPage.tsx
+// packages/client/src/DepositPage.tsx
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from './api';
 
-export const TransferPage = () => {
+export const DepositPage = () => {
   const navigate = useNavigate();
   const [myAccount, setMyAccount] = useState<any>(null);
-  const [toAccountNumber, setToAccountNumber] = useState('');
   const [amount, setAmount] = useState('');
 
   useEffect(() => {
-    // 修正: async関数を中で定義して呼ぶ
     const fetchMyAccount = async () => {
       const userStr = localStorage.getItem('user');
       if (!userStr) {
@@ -23,7 +21,7 @@ export const TransferPage = () => {
         const res = await api.get(`/users/${user.id}/account`);
         setMyAccount(res.data);
       } catch (err) {
-        alert('エラー: 口座情報を取得できませんでした');
+        alert('口座情報の取得に失敗しました');
       }
     };
 
@@ -32,18 +30,17 @@ export const TransferPage = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!window.confirm(`${amount}円を送金しますか？`)) return;
+    if (!window.confirm(`${amount}円を入金しますか？`)) return;
 
     try {
-      await api.post('/transfer', {
-        fromAccountId: myAccount.id,
-        toAccountNumber,
+      await api.post('/deposit', {
+        accountId: myAccount.id,
         amount: Number(amount)
       });
-      alert('送金完了');
+      alert('入金が完了しました！');
       navigate('/dashboard');
     } catch (err: any) {
-      alert(`エラー: ${err.response?.data?.error || '送金失敗'}`);
+      alert(`エラー: ${err.response?.data?.error || '入金失敗'}`);
     }
   };
 
@@ -53,7 +50,7 @@ export const TransferPage = () => {
     <div className="container">
       <div className="card">
         <header className="flex-between">
-          <h2>送金</h2>
+          <h2>入金 (ATM)</h2>
           <button onClick={() => navigate('/dashboard')} className="secondary" style={{ width: 'auto' }}>戻る</button>
         </header>
 
@@ -61,29 +58,18 @@ export const TransferPage = () => {
         
         <form onSubmit={handleSubmit} className="mt-20">
           <div>
-            <label>送金先 口座番号</label>
-            <input 
-              type="text" 
-              value={toAccountNumber} 
-              onChange={e => setToAccountNumber(e.target.value)} 
-              placeholder="1234567890"
-              required 
-            />
-          </div>
-
-          <div>
-            <label>送金金額 (円)</label>
+            <label>入金金額 (円)</label>
             <input 
               type="number" 
               value={amount} 
               onChange={e => setAmount(e.target.value)} 
-              placeholder="1000"
+              placeholder="例: 10000"
               min="1"
               required 
             />
           </div>
 
-          <button type="submit">送金実行</button>
+          <button type="submit" style={{ backgroundColor: 'var(--success)' }}>入金実行</button>
         </form>
       </div>
     </div>
