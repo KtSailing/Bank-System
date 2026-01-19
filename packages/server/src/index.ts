@@ -19,9 +19,8 @@ app.use('/api', routes); // 追加
 
 const startServer = async () => {
   try {
-    console.log('1. DB同期を開始します...'); // 追加
+    // force: true にしてテーブルを作り直す（データは消えます）
     await sequelize.sync({ force: false }); 
-    console.log('2. DB同期が完了しました！'); // 追加
 
     app.listen(PORT, () => {
       console.log(`🚀 Server running on http://localhost:${PORT}`);

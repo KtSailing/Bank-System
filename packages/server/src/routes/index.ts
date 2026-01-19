@@ -8,6 +8,7 @@ import {
   getUserAccount // 追加インポート
 } from '../controllers/accountController';
 import { transferMoney, depositMoney } from '../controllers/transferController';
+import { getAllTransactions } from '../controllers/adminController'; // 追加
 
 const router = Router();
 
@@ -23,5 +24,8 @@ router.post('/deposit', depositMoney);
 
 // 追加: ユーザーIDから口座を取得するルート
 router.get('/users/:userId/account', getUserAccount);
+
+// 管理者用: 全取引履歴 (N+1問題あり)
+router.get('/admin/transactions', getAllTransactions);
 
 export default router;
